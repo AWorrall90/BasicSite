@@ -284,6 +284,21 @@ function askNumber(title, initial) {
   }, { title });
 }
 
+// ---------- Scanning ----------
+
+// "Scan" when photo reading is on (photo, then read straight away), plain "Photo" when it is off.
+function scanButton(what, onclick, cls = '') {
+  const btn = h(`button${cls}`, { onclick }, `📷 Photo of ${what}`);
+  aiEnabled().then((on) => { if (on) btn.textContent = `📷 Scan ${what}`; });
+  return btn;
+}
+
+// Read new photos at once, unless lines were already read or typed: then re-reading would replace them.
+function scanned(readBtn, existingLines, what) {
+  if (!existingLines) readBtn.click();
+  else toast(`Page added. Tap "${readBtn.textContent}" to re-read all pages; this replaces the lines below.`);
+}
+
 // ---------- Deliveries (stock in) ----------
 
 function deliveryScreen(id) {
@@ -370,7 +385,13 @@ function deliveryScreen(id) {
   return [
     h('h1', existing ? 'Delivery' : 'New delivery'),
     h('div.card',
-      h('div.row', h('button', { onclick: async () => { d.photoIds.push(...await addPhotos(2000)); drawPhotos(); } }, '📷 Photo of invoice'), readBtn),
+      h('div.row', scanButton('invoice', async () => {
+        const ids = await addPhotos(2000);
+        if (!ids.length) return;
+        d.photoIds.push(...ids);
+        drawPhotos();
+        if (await aiEnabled()) scanned(readBtn, d.lines.length, 'invoice');
+      }), readBtn),
       photos),
     h('div.grid2', supplier, reference),
     h('label', 'Delivery date', date),
@@ -524,7 +545,13 @@ function salesScreen(id) {
     h('h1', existing ? 'Sales' : 'Add sales'),
     h('div.card',
       h('div.row', h('button', { onclick: importCsv }, '⬆ Import ePOS CSV'),
-        h('button.secondary', { onclick: async () => { s.photoIds.push(...await addPhotos(2000)); drawPhotos(); } }, '📷 Photo of report')),
+        scanButton('report', async () => {
+          const ids = await addPhotos(2000);
+          if (!ids.length) return;
+          s.photoIds.push(...ids);
+          drawPhotos();
+          if (await aiEnabled()) scanned(readBtn, s.lines.length, 'report');
+        }, '.secondary')),
       photos, readBtn),
     label,
     h('div.grid2', h('label', 'From', from), h('label', 'To', to)),

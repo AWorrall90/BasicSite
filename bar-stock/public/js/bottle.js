@@ -73,6 +73,9 @@ export async function measureBottle(product) {
       });
     }
 
+    // Estimate straight away; the markers can still be adjusted afterwards.
+    if (aiButton) setTimeout(() => aiButton.click());
+
     return [
       h('p.muted.small', 'Drag the lines: green to where a full bottle fills to, blue to the liquid now, red to the inside bottom.'),
       stage,
