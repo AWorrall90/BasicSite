@@ -1,0 +1,15 @@
+# Render Blueprint: deploys the bar stock app as a web service with an HTTPS address.
+services:
+  - type: web
+    name: bar-stock
+    runtime: node
+    plan: free
+    rootDir: bar-stock
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/status
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ACCESS_CODE
+        sync: false

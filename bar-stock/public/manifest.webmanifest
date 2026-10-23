@@ -1,0 +1,9 @@
+{
+  "name": "Bar Stock",
+  "short_name": "Bar Stock",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1d1b26",
+  "theme_color": "#1d1b26",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

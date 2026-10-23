@@ -1,0 +1,18 @@
+{
+  "name": "bar-stock",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bar stock-taking web app: opening counts, invoice photos for stock in, ePOS imports for stock out, and photo-based bottle level estimates.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.2.0",
+    "zod": "^4.6.7"
+  }
+}
