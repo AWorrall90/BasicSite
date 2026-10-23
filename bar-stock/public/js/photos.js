@@ -23,9 +23,23 @@ export function pickFile(accept) {
   });
 }
 
+// Older iOS Safari rejects createImageBitmap's options, so fall back to an <img>, which applies EXIF rotation itself.
+async function decode(file) {
+  try {
+    return await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    URL.revokeObjectURL(url);
+    return img;
+  }
+}
+
 // Resize to keep uploads and storage small while keeping invoice text legible.
 export async function shrink(file, maxSide = 2000, quality = 0.85) {
-  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  const bitmap = await decode(file);
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(bitmap.width * scale);

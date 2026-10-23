@@ -1,6 +1,6 @@
 // Caches the app shell so counts can be done with poor signal in a cellar. API calls always go to the network.
-const CACHE = 'bar-stock-v1';
-const SHELL = ['./', 'index.html', 'styles.css', 'manifest.webmanifest', 'icon.svg',
+const CACHE = 'bar-stock-v2';
+const SHELL = ['./', 'index.html', 'styles.css', 'manifest.webmanifest', 'icon.svg', 'icon-180.png',
   'js/app.js', 'js/core.js', 'js/db.js', 'js/ui.js', 'js/photos.js', 'js/bottle.js'];
 
 self.addEventListener('install', (e) => {

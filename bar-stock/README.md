@@ -21,9 +21,16 @@ Without `ANTHROPIC_API_KEY` the app still works: photos are stored with each del
 
 Optional settings: `PORT` (default 3000) and `CLAUDE_MODEL` (default `claude-opus-5-5`).
 
-### On a phone
+### On an iPhone
 
-The camera opens through the browser's photo picker, so it works over plain HTTP on the local network (`http://<computer-ip>:3000`). To install the app on the home screen and use it offline (counting in a cellar with no signal), serve it over HTTPS, for example behind a reverse proxy or on a host such as Render or Fly.io.
+1. Run the server on a computer on the same Wi-Fi as the phone (see above).
+2. Find the computer's local IP address: on a Mac, System Settings → Wi-Fi → Details; on Windows, run `ipconfig`.
+3. In Safari on the iPhone, open `http://<that-ip>:3000`. The camera, photo reading and storage all work over plain HTTP.
+4. Optional: tap Share → **Add to Home Screen** to open it full-screen like an app.
+
+For use away from that Wi-Fi, and for offline use in a cellar with no signal, host it on an HTTPS service such as Render, Railway or Fly.io. Set `ANTHROPIC_API_KEY` there, then open the HTTPS address in Safari and add it to the Home Screen.
+
+Data is stored in Safari on that phone. Safari can clear the storage of a site that isn't added to the Home Screen and hasn't been used for a few weeks, so add it to the Home Screen and export backups.
 
 ## How it works
 
