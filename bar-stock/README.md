@@ -19,7 +19,20 @@ ANTHROPIC_API_KEY=sk-ant-... npm start     # http://localhost:3000
 
 Without `ANTHROPIC_API_KEY` the app still works: photos are stored with each delivery, sales report and count, and you enter the figures by hand. The bottle-level tool works without AI too.
 
-Optional settings: `PORT` (default 3000) and `CLAUDE_MODEL` (default `claude-opus-5-5`).
+Optional settings: `PORT` (default 3000), `CLAUDE_MODEL` (default `claude-opus-5-5`) and `ACCESS_CODE` (if set, photo reading asks for this code once per device; you can change it under Settings).
+
+### Put it online with an HTTPS link (Render)
+
+The repo includes a `render.yaml` blueprint.
+
+1. Sign up at https://render.com with your GitHub account.
+2. Click **New → Blueprint** and choose this repository. Pick the branch that holds `render.yaml` (`master` once the app is merged).
+3. Render asks for two values:
+   - `ANTHROPIC_API_KEY`: your key from https://console.anthropic.com
+   - `ACCESS_CODE`: any code you choose. Phones must enter it once before photo reading works, so strangers who find the link can't spend your API credit.
+4. Click **Apply**. After a few minutes the service shows an address such as `https://bar-stock-xxxx.onrender.com`.
+
+On the free plan the server sleeps after about 15 minutes of no use, so the first load after that takes up to a minute. Your stock data is unaffected, because it is stored on the phone. Every push to the branch deploys again automatically.
 
 ### On an iPhone
 

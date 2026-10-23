@@ -1,7 +1,7 @@
 import * as core from './core.js';
 import * as db from './db.js';
 import { h, toast, modal, confirmDialog, busy, fmtNum, fmtMoney, fmtDate, download } from './ui.js';
-import { takePhoto, pickFile, shrink, aiEnabled, readWithAI } from './photos.js';
+import { takePhoto, pickFile, shrink, aiEnabled, readWithAI, getAccessCode, setAccessCode } from './photos.js';
 import { measureBottle } from './bottle.js';
 
 const CATEGORIES = ['Spirits', 'Liqueurs', 'Wine', 'Draught', 'Bottled beer & cider', 'Soft drinks', 'Other'];
@@ -598,9 +598,12 @@ function settingsScreen() {
   aiEnabled().then((on) => {
     status.textContent = on ? 'AI photo reading is on.' : 'AI photo reading is off on this server. Photos are still stored; enter details by hand.';
   });
+  const code = h('input', { type: 'password', value: getAccessCode(), placeholder: 'Only needed if the server has one', autocomplete: 'off' });
+  code.onchange = () => { setAccessCode(code.value.trim()); toast('Access code saved'); };
   return [
     h('h1', 'Settings'),
     status,
+    h('label', 'Access code for photo reading', code),
     h('div.card',
       h('h2', 'Backup'),
       h('p.muted.small', 'Data is stored on this device only. Export a backup regularly (photos are not included).'),

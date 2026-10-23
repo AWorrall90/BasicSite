@@ -1,5 +1,6 @@
 // Serves the web app and the /api endpoints that read photos with Claude.
 import http from 'node:http';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +15,13 @@ const TYPES = {
   '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.webmanifest': 'application/manifest+json',
 };
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+// When set, photo reading needs this code, so a public link can't run up the API bill.
+const ACCESS_CODE = process.env.ACCESS_CODE || '';
+
+function codeMatches(given) {
+  const hash = (s) => createHash('sha256').update(String(s)).digest();
+  return timingSafeEqual(hash(given || ''), hash(ACCESS_CODE));
+}
 
 function send(res, status, body, type = 'application/json') {
   res.writeHead(status, { 'Content-Type': type, 'Cache-Control': 'no-store' });
@@ -32,11 +40,12 @@ async function readJson(req) {
 }
 
 async function handleApi(req, res, path) {
-  if (path === '/api/status' && req.method === 'GET') return send(res, 200, { ai: aiAvailable() });
+  if (path === '/api/status' && req.method === 'GET') return send(res, 200, { ai: aiAvailable(), needsCode: Boolean(ACCESS_CODE) });
 
   const task = path.match(/^\/api\/read\/(invoice|sales|bottle)$/)?.[1];
   if (!task || req.method !== 'POST') return send(res, 404, { error: 'Not found' });
   if (!aiAvailable()) return send(res, 503, { error: 'Photo reading is not set up on this server (no ANTHROPIC_API_KEY).' });
+  if (ACCESS_CODE && !codeMatches(req.headers['x-access-code'])) return send(res, 401, { error: 'Wrong access code' });
 
   const body = await readJson(req);
   const images = (body.images || []).filter((i) => IMAGE_TYPES.has(i.mediaType) && typeof i.data === 'string');

@@ -64,14 +64,31 @@ export async function aiEnabled() {
   return aiStatus;
 }
 
+const CODE_KEY = 'bar-stock-access-code';
+
+export function getAccessCode() {
+  try { return localStorage.getItem(CODE_KEY) || ''; } catch { return ''; }
+}
+
+export function setAccessCode(code) {
+  try { localStorage.setItem(CODE_KEY, code); } catch { /* private browsing: asked again next time */ }
+}
+
 // task: 'invoice' | 'sales' | 'bottle'
 export async function readWithAI(task, blobs, context = {}) {
   const images = await Promise.all(blobs.map(async (b) => ({ mediaType: b.type || 'image/jpeg', data: await toBase64(b) })));
-  const res = await fetch(`/api/read/${task}`, {
+  const send = () => fetch(`/api/read/${task}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Access-Code': getAccessCode() },
     body: JSON.stringify({ images, context }),
   });
+  let res = await send();
+  if (res.status === 401) {
+    const code = prompt(getAccessCode() ? 'That access code was wrong. Enter the access code for photo reading:' : 'Enter the access code for photo reading:');
+    if (!code) throw new Error('Photo reading needs the access code');
+    setAccessCode(code.trim());
+    res = await send();
+  }
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.error || `Photo reading failed (${res.status})`);
   return body;
